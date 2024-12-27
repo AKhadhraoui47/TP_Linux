@@ -1,0 +1,100 @@
+
+# Colors for formatting
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NC='\033[0m' # No Color
+
+# Function to display the menu
+show_menu() {
+    echo "========================="
+    echo "      System Manager      "
+    echo "========================="
+    echo "1) Démarrer les services"
+    echo "2) Arrêter les services"
+    echo "3) Redémarrer le système"
+    echo "4) Éteindre le système"
+    echo "5) Quitter"
+    echo "========================="
+}
+
+# Function to start services
+start_services() {
+    read -p "Entrez le nom du service à démarrer (ou 'all' pour tous les services disponibles) : " service
+    if [[ $service == "all" ]]; then
+        systemctl list-unit-files --type=service | grep enabled | awk '{print $1}' | xargs -n1 sudo systemctl start
+        echo -e "${GREEN}Tous les services activés ont été démarrés.${NC}"
+    else
+        if systemctl start "$service"; then
+            echo -e "${GREEN}Le service '$service' a été démarré avec succès.${NC}"
+        else
+            echo -e "${RED}Échec du démarrage du service '$service'. Vérifiez le nom ou les permissions.${NC}"
+        fi
+    fi
+}
+
+# Function to stop services
+stop_services() {
+    read -p "Entrez le nom du service à arrêter (ou 'all' pour tous les services) : " service
+    if [[ $service == "all" ]]; then
+        systemctl list-units --type=service | grep running | awk '{print $1}' | xargs -n1 sudo systemctl stop
+        echo -e "${GREEN}Tous les services en cours d'exécution ont été arrêtés.${NC}"
+    else
+        if systemctl stop "$service"; then
+            echo -e "${GREEN}Le service '$service' a été arrêté avec succès.${NC}"
+        else
+            echo -e "${RED}Échec de l'arrêt du service '$service'. Vérifiez le nom ou les permissions.${NC}"
+        fi
+    fi
+}
+
+# Function to restart the system
+restart_system() {
+    echo -e "${RED}Attention : Cela redémarrera le système immédiatement.${NC}"
+    read -p "Êtes-vous sûr de vouloir continuer ? (yes/no) : " confirm
+    if [[ $confirm == "yes" ]]; then
+        echo -e "${GREEN}Redémarrage du système...${NC}"
+        reboot
+    else
+        echo -e "${GREEN}Opération annulée.${NC}"
+    fi
+}
+
+# Function to shut down the system
+shutdown_system() {
+    echo -e "${RED}Attention : Cela éteindra le système immédiatement.${NC}"
+    read -p "Êtes-vous sûr de vouloir continuer ? (yes/no) : " confirm
+    if [[ $confirm == "yes" ]]; then
+        echo -e "${GREEN}Extinction du système...${NC}"
+        poweroff
+    else
+        echo -e "${GREEN}Opération annulée.${NC}"
+    fi
+}
+
+# Main loop
+while true; do
+    show_menu
+    read -p "Choisissez une option : " choice
+    case $choice in
+        1)
+            start_services
+            ;;
+        2)
+            stop_services
+            ;;
+        3)
+            restart_system
+            ;;
+        4)
+            shutdown_system
+            ;;
+        5)
+            echo -e "${GREEN}Quitter le gestionnaire du système.${NC}"
+            break
+            ;;
+        *)
+            echo -e "${RED}Option invalide. Veuillez réessayer.${NC}"
+            ;;
+    esac
+    echo
+done

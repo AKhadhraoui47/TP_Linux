@@ -1,0 +1,77 @@
+
+while true; do
+    echo "========================="
+    echo "     Account Manager     "
+    echo "========================="
+    echo "1) Afficher le fichier /etc/passwd"
+    echo "2) Afficher les droits d'accès d'un fichier"
+    echo "3) Lister les comptes ayant le droit de root"
+    echo "4) Supprimer le mot de passe d'un compte"
+    echo "5) Lister les fichiers SUID"
+    echo "6) Lister les fichiers GUID"
+    echo "7) Lister les répertoires Sticky bit"
+    echo "8) Lancer un sniffer (TCPDUMP)"
+    echo "99) Quitter"
+    echo "========================="
+
+    read -p "Votre choix: " choix
+
+    case $choix in
+        1)
+            echo "Afficher le fichier /etc/passwd"
+            cat /etc/passwd
+            ;;
+        2)
+            echo "Afficher les droits d'accès d'un fichier"
+            read -p "Entrez le chemin du fichier : " fichier
+            if [ -e "$fichier" ]; then
+                ls -l "$fichier"
+            else
+                echo "Le fichier n'existe pas."
+            fi
+            ;;
+        3)
+            echo "Lister les comptes ayant le droit de root"
+            grep :0: /etc/passwd
+            ;;
+        4)
+            echo "Supprimer le mot de passe d'un compte"
+            cat /etc/passwd
+            read -p "Entrez le nom du compte : " nom
+            if grep -q "^$nom:" /etc/passwd; then
+                sed -i "s/^$nom:x:/$nom::/" /etc/passwd && echo "Mot de passe supprimé pour le compte $nom."
+            else
+                echo "Le compte $nom n'existe pas."
+            fi
+            ;;
+        5)
+            echo "Lister les fichiers SUID"
+            find / -perm -4000 -type f 2>/dev/null
+            ;;
+        6)
+            echo "Lister les fichiers GUID"
+            find / -perm -2000 -type f 2>/dev/null
+            ;;
+        7)
+            echo "Lister les répertoires Sticky bit"
+            find / -perm -1000 -type d 2>/dev/null
+            ;;
+        8)
+            echo "Lancer un sniffer (TCPDUMP)"
+            read -p "Saisir l'interface réseau à surveiller : " interface
+            if command -v tcpdump &> /dev/null; then
+                tcpdump -i "$interface"
+            else
+                echo "TCPDUMP n'est pas installé. Veuillez l'installer d'abord."
+            fi
+            ;;
+        99)
+            echo "Quitter le programme."
+            exit 0
+            ;;
+        *)
+            echo "Option invalide. Veuillez réessayer."
+            ;;
+    esac
+    echo
+done

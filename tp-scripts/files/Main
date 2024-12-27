@@ -1,0 +1,41 @@
+
+(( choix = 0 ))
+while (( choice != 5 ))
+do 
+
+echo "Administration UNix"
+echo "1-Gestion des modules"
+echo "2-Arret et Demarrage du Sys"
+echo "3-Gestion des processus"
+echo "4-Gestion des comptes"
+echo "5-Quitter"
+
+echo "Enter choice: "
+read choice
+
+case $choice in 
+1)
+	echo "Gestion des modules"
+	gest_mod
+	;;
+2)
+	echo "Arret et Demarrage du sys"
+	sys_gest
+	;;
+3)
+	echo "Gestion du processus"
+	gest_process
+	;;
+4)
+	echo "Gest des comptes"
+	gest_acc
+	;;
+5)
+	echo "Quit"
+	exit
+	;;
+*)
+	echo "No choice mentionned"
+	;;
+esac
+done

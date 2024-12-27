@@ -1,0 +1,71 @@
+
+# Colors for formatting
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NC='\033[0m' # No Color
+
+# Function to display the menu
+show_menu() {
+    echo "========================="
+    echo "    Process Manager      "
+    echo "========================="
+    echo "1) List all processes"
+    echo "2) Start a process"
+    echo "3) Stop a process"
+    echo "4) Restart a process"
+    echo "5) Check process status"
+    echo "6) Exit"
+    echo "========================="
+}
+
+# Main loop
+while true; do
+    show_menu
+    read -p "Choose an option: " choice
+    case $choice in
+        1)
+            echo -e "${GREEN}Listing all processes:${NC}"
+            ps # BusyBox-compatible command
+            ;;
+        2)
+            read -p "Enter the command to start the process: " process
+            echo -e "${GREEN}Starting process: ${NC}$process"
+            $process &
+            ;;
+        3)
+            read -p "Enter the PID or name of the process to stop: " process
+            if [[ $process =~ ^[0-9]+$ ]]; then
+                kill -9 $process && echo -e "${GREEN}Process $process stopped.${NC}" || echo -e "${RED}Failed to stop process $process.${NC}"
+            else
+                pkill -f $process && echo -e "${GREEN}Process $process stopped.${NC}" || echo -e "${RED}Failed to stop process $process.${NC}"
+            fi
+            ;;
+        4)
+            read -p "Enter the PID or name of the process to restart: " process
+            if [[ $process =~ ^[0-9]+$ ]]; then
+                kill -9 $process && echo -e "${GREEN}Process $process stopped.${NC}"
+            else
+                pkill -f $process && echo -e "${GREEN}Process $process stopped.${NC}"
+            fi
+            read -p "Enter the command to restart the process: " restart_cmd
+            echo -e "${GREEN}Restarting process: ${NC}$restart_cmd"
+            $restart_cmd &
+            ;;
+        5)
+            read -p "Enter the PID or name of the process to check status: " process
+            if ps | grep -q "$process"; then
+                echo -e "${GREEN}Process $process is running.${NC}"
+            else
+                echo -e "${RED}Process $process is not running.${NC}"
+            fi
+            ;;
+        6)
+            echo -e "${GREEN}Exiting Process Manager.${NC}"
+            break
+            ;;
+        *)
+            echo -e "${RED}Invalid option. Please try again.${NC}"
+            ;;
+    esac
+    echo
+done

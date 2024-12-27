@@ -1,0 +1,52 @@
+
+# Initialisation du choix
+choice=0
+
+# Boucle principale
+while ((choice != 4)); do
+    echo "========================="
+    echo "      Module Manager     "
+    echo "========================="
+    echo "1) Lister les modules"
+    echo "2) Ajouter un module"
+    echo "3) Supprimer un module"
+    echo "4) Quitter"
+    echo "========================="
+
+    read -p "Faites votre choix: " choice
+
+    case $choice in
+        0)
+            echo "Veuillez faire un choix valide."
+            ;;
+        1)
+            echo "Liste des modules chargés :"
+            lsmod
+            ;;
+        2)
+            read -p "Entrez le nom du module à ajouter : " name
+            if modprobe "$name"; then
+                echo "Le module '$name' a été ajouté avec succès."
+            else
+                echo "Échec de l'ajout du module '$name'. Vérifiez le nom ou les droits."
+            fi
+            ;;
+        3)
+            read -p "Entrez le nom du module à supprimer : " name
+            if rmmod "$name"; then
+                echo "Le module '$name' a été supprimé avec succès."
+            else
+                echo "Échec de la suppression du module '$name'. Vérifiez si le module est chargé."
+            fi
+            ;;
+        4)
+            echo "Quitter le gestionnaire de modules."
+            exit 0
+            ;;
+        *)
+            echo "Option invalide. Veuillez choisir une option entre 1 et 4."
+            ;;
+    esac
+
+    echo
+done
